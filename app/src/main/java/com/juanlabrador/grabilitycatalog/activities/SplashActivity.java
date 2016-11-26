@@ -1,13 +1,12 @@
 package com.juanlabrador.grabilitycatalog.activities;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.google.gson.Gson;
+import com.juanlabrador.grabilitycatalog.R;
 import com.juanlabrador.grabilitycatalog.interfaces.AsyncFeedResponse;
 import com.juanlabrador.grabilitycatalog.models.Data;
-import com.juanlabrador.grabilitycatalog.models.Feed;
 import com.juanlabrador.grabilitycatalog.taks.FeedContentTask;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,6 +23,12 @@ public class SplashActivity extends BaseActivity implements AsyncFeedResponse {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(getResources().getBoolean(R.bool.portrait_only)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
 
         data = EventBus.getDefault().getStickyEvent(Data.class);
 

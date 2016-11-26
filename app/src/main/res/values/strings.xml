@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">GrabilityCatalog</string>
-
+    <string name="message.without.internet">No tienes conexión a Internet.</string>
+    <string name="button.retry">Reintentar</string>
     <!-- Category Screen -->
     <string name="category.title">Categorías</string>
 

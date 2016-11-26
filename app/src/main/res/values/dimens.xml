@@ -8,4 +8,5 @@
     <dimen name="headerText">20sp</dimen>
     <dimen name="smallText">13sp</dimen>
     <dimen name="tinyText">11sp</dimen>
+    <dimen name="applicationLandText">24sp</dimen>
 </resources>

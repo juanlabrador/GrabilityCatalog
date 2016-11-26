@@ -1,10 +1,17 @@
 package com.juanlabrador.grabilitycatalog.activities;
 
+import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
+import com.dgreenhalgh.android.simpleitemdecoration.grid.GridDividerItemDecoration;
 import com.juanlabrador.grabilitycatalog.R;
 import com.juanlabrador.grabilitycatalog.adapters.ApplicationAdapter;
 import com.juanlabrador.grabilitycatalog.adapters.CategoryAdapter;
@@ -26,6 +33,8 @@ public class ApplicationActivity extends BaseActivity implements AsyncFeedRespon
 
     @BindView(R.id.categories)
     RecyclerView recyclerView;
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
     ApplicationAdapter adapter;
     Data data;
     List<Entry> entries = new ArrayList<>();
@@ -38,6 +47,7 @@ public class ApplicationActivity extends BaseActivity implements AsyncFeedRespon
         setContentView(R.layout.activity_general);
         ButterKnife.bind(this);
 
+        progressBar.setVisibility(View.VISIBLE);
         idCategory = getIntent().getStringExtra("id");
         nameCategory = getIntent().getStringExtra("name");
 
@@ -45,7 +55,18 @@ public class ApplicationActivity extends BaseActivity implements AsyncFeedRespon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        if(getResources().getBoolean(R.bool.portrait_only)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            Drawable dividerDrawable = ContextCompat.getDrawable(this, R.drawable.divider_grid);
+            GridDividerItemDecoration itemDecoration = new GridDividerItemDecoration(dividerDrawable, dividerDrawable, 5);
+            recyclerView.addItemDecoration(itemDecoration);
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 5));
+        }
+
 
         data = EventBus.getDefault().getStickyEvent(Data.class);
 
@@ -65,6 +86,7 @@ public class ApplicationActivity extends BaseActivity implements AsyncFeedRespon
             }
         }
 
+        progressBar.setVisibility(View.GONE);
         adapter = new ApplicationAdapter(this, entries, nameCategory);
         recyclerView.setAdapter(adapter);
     }

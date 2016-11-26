@@ -2,6 +2,8 @@ package com.juanlabrador.grabilitycatalog.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,8 @@ import com.juanlabrador.grabilitycatalog.activities.BaseActivity;
 import com.juanlabrador.grabilitycatalog.models.Category;
 import com.juanlabrador.grabilitycatalog.models.Entry;
 import com.makeramen.roundedimageview.RoundedImageView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -60,10 +64,20 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             @Override
             public void onClick(View view) {
                 Entry entry = (Entry) ((ViewHolderApplication) holder).view.getTag();
-                parent.startActivity(new Intent(parent, ApplicationInfoActivity.class)
-                        .putExtra("id", entry.getId().getAttributes().getId())
-                        .putExtra("name", entry.getName().getLabel()));
-                parent.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                EventBus.getDefault().postSticky(entry);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptionsCompat optionsCompat =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(parent,
+                                    ((ViewHolderApplication) holder).icon, "icon");
+                    parent.startActivity(new Intent(parent, ApplicationInfoActivity.class)
+                            .putExtra("id", entry.getId().getAttributes().getId())
+                            .putExtra("name", entry.getName().getLabel()), optionsCompat.toBundle());
+                } else {
+                    parent.startActivity(new Intent(parent, ApplicationInfoActivity.class)
+                            .putExtra("id", entry.getId().getAttributes().getId())
+                            .putExtra("name", entry.getName().getLabel()));
+                    parent.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                }
 
             }
         });

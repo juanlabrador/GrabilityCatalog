@@ -1,5 +1,7 @@
 package com.juanlabrador.grabilitycatalog.activities;
 
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -21,7 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ApplicationInfoActivity extends BaseActivity implements AsyncFeedResponse {
+public class ApplicationInfoActivity extends BaseActivity {
 
     @BindView(R.id.icon)
     RoundedImageView icon;
@@ -38,7 +40,6 @@ public class ApplicationInfoActivity extends BaseActivity implements AsyncFeedRe
     @BindView(R.id.company)
     TextView company;
 
-    Data data;
     String idApplication;
     String nameApplication;
     Entry entry;
@@ -49,31 +50,28 @@ public class ApplicationInfoActivity extends BaseActivity implements AsyncFeedRe
         setContentView(R.layout.activity_application_info);
         ButterKnife.bind(this);
 
+        if(getResources().getBoolean(R.bool.portrait_only)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+
         idApplication = getIntent().getStringExtra("id");
         nameApplication = getIntent().getStringExtra("name");
 
         getSupportActionBar().setTitle(nameApplication);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        data = EventBus.getDefault().getStickyEvent(Data.class);
+        entry = EventBus.getDefault().getStickyEvent(Entry.class);
 
-        if(data != null) {
+        if(entry != null) {
             createApplication();
         } else {
-            final FeedContentTask asyncTask = new FeedContentTask(getApplicationContext());
-            asyncTask.delegate = this;
-            asyncTask.execute();
+            onBackPressed();
         }
     }
 
     public void createApplication() {
-        for (Entry entry : data.getFeed().getEntry()) {
-            if (entry.getId().getAttributes().getId().equals(idApplication)) {
-                this.entry = entry;
-                break;
-            }
-        }
-
         Glide.with(this).load(entry.getImages().get(2).getLabel()).into(icon);
         application.setText(entry.getName().getLabel());
         summary.setText(entry.getSummary().getLabel());
@@ -81,13 +79,6 @@ public class ApplicationInfoActivity extends BaseActivity implements AsyncFeedRe
         updated.setText(entry.getReleaseDate().getAttributes().getLabel());
         category.setText(entry.getCategory().getAttributes().getLabel());
         company.setText(entry.getArtist().getLabel());
-    }
-
-    @Override
-    public void processFinish(Data data) {
-        this.data = data;
-        EventBus.getDefault().postSticky(data);
-        createApplication();
     }
 
     @Override
@@ -103,6 +94,10 @@ public class ApplicationInfoActivity extends BaseActivity implements AsyncFeedRe
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_out_right, R.anim.slide_in_right);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            supportFinishAfterTransition();
+        } else {
+            overridePendingTransition(R.anim.slide_out_right, R.anim.slide_in_right);
+        }
     }
 }
