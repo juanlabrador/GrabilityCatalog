@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">GrabilityCatalog</string>
+
+    <!-- Category Screen -->
+    <string name="category.title">Categorías</string>
+
+
+    <!-- Application Info Screen -->
+    <string name="application.info.salesman">Vendedor</string>
+    <string name="application.info.category">Categoría</string>
+    <string name="application.info.updated">Actualizado</string>
+    <string name="application.info.summary">Resumen</string>
+</resources>
